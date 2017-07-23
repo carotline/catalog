@@ -1,0 +1,19 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+<div class="row recipe-item">
+    <h2> Are you sure you want to delete {{recipe.name}}? </h2>
+    <div class="edit-recipe-btn">
+        <form action="#" method='post'>
+            <button type="submit" class="btn btn-default delete" id="submit" type="submit">
+            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span><span class="btn-txt">Delete</span></button>
+        </form>
+
+        <a href = "{{url_for('showRecipe', category_id = category.id, recipe_id = recipe.id )}}">
+            <button class="btn btn-default delete">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span><span class="btn-txt">Cancel</span>
+            </button>
+        </a>
+    </div>
+</div>
+{% endblock %}

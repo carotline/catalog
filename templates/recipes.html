@@ -1,0 +1,51 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+	<div class="row divider white">
+		<div class="col-md-12"></div>
+	</div>
+	<div class="row banner main">
+        <div class="col-md-1 xs-invisible">
+		</div>
+		<div class="col-xs-8 col-md-7">
+			<h1>{{ category.name }}</h1>
+		</div>
+        <div class="col-xs-4 col-md-3">
+            <a href="{{url_for('newRecipe', category_id = category.id )}}">
+                <button class="btn btn-default" id="new-menu-item">
+                    <span class="glyphicon glyphicon-glass" aria-hidden="true"></span><span class="btn-txt">Add Recipe</span>
+                </button>
+            </a>
+        </div>
+        <div class="col-md-1 xs-invisible">
+		</div>
+	</div>
+
+    <div class = 'flash'>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %} 
+                <ul class="row">
+                    {% for message in messages %}
+                    <li class="col-md-1"></li>
+                        <li class="col-md-10"> <strong> {{ message }} </strong> </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+	{% if recipes !=[] %}
+        <div class="menu-categories">
+            {% for recipe in recipes %}
+                <a href = "{{url_for('showRecipe', category_id = category.id, recipe_id = recipe.id)}}">
+                    <div class="row">
+                        <div class="col-md-1"></div>
+                            <div class="col-md-10 recipe-list">
+                                <h3>{{recipe.name}}</h3>
+                            </div>
+                        <div class="col-md-1"></div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+	{% endif %}
+{% endblock %}

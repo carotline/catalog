@@ -1,0 +1,38 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+	<div class="row divider green">
+		<div class="col-md-12"></div>
+	</div>
+	<div class="row banner main">
+		<div class="col-md-11">
+			<h1>New Recipe</h1>
+		</div>
+	</div>
+    <div class="recipe-item">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-1 padding-top">
+                <form action="#" method = "post">
+                    <div class="form-group">
+                        <label for="name">Name:</label>
+                        <input type ="text" maxlength="50" class="form-control" name="name" placeholder="Name of the recipe">
+
+                        <label for="description">Ingredients:</label>
+                        <textarea class="form-control" maxlength="850" rows="13" name="ingredients" placeholder="Ingredients"></textarea>
+
+                        <label for="price">Preparation:</label>
+            
+                        <textarea rows="13" class="form-control" name="preparation" placeholder="Preparation"></textarea>
+                      
+                        <label for="name">Image:</label>
+                        <input type ="text" maxlength="450" class="form-control" name="image" placeholder="Enter URL here">
+
+                        <button type="submit" class="btn btn-default create" id="submit" type="submit">
+                        <span class="glyphicon glyphicon-glass" aria-hidden="true"></span><span class="btn-txt">Create</span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

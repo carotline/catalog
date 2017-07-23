@@ -1,0 +1,43 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+	<div class="row divider green">
+		<div class="col-md-12"></div>
+	</div>
+	<div class="row banner main">
+		<div class="col-md-11">
+			<h1>New Recipe</h1>
+		</div>
+	</div>
+    <div class="recipe-item">
+	   <div class="row">
+		<div class="col-md-6 col-md-offset-1 padding-top">
+			<form action="#" method = "post">
+				<div class="form-group">
+					<label for="name">Name:</label>
+					<input type="text" maxlength="100" class="form-control" name="name" value="{{recipe.name }}">
+
+					<label for="description">Ingredients:</label>
+					<textarea class="form-control" rows="13" name="ingredients">{{recipe.ingredients}}</textarea>
+
+					<label for="price">Preparation:</label>
+						<textarea rows="13" class="form-control" name="preparation">{{recipe.preparation}}</textarea>
+					<label for="course">Image:</label>
+                    <input type ="text" maxlength="250" class="form-control" name="image" value="{{recipe.image}}">
+					<div class="edit-recipe-btn">
+                        <button type="submit" class="btn btn-default" id="submit" type="submit">
+                            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span><span class="btn-txt">Save</span>
+                        </button>
+                        <a href = "{{url_for('showRecipe', category_id = category.id, recipe_id = recipe.id )}}">
+                            <div class="btn btn-default delete">
+                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                <span class="btn-txt">Cancel</span>
+                            </div>
+                        </a>
+                    </div>
+				</div>
+			</form>
+		</div>
+	</div>
+    </div>
+{% endblock %}
