@@ -14,16 +14,22 @@ import json
 from flask import make_response
 import requests
 from functools import wraps
+import os
+import sys
+import logging
+logging.basicConfig(stream=sys.stderr)
 
 app = Flask(__name__)
 
+JSON_PATH = "/var/www/FlaskApps/catalog/"
+
 # load secret id for facebook from json file
 CLIENT_ID = json.loads(
-    open('client_secrets.json', 'r').read())['web']['client_id']
+    open(JSON_PATH + 'client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "My Favorite Recipe Application"
 
 # Connect to Database and create database session
-engine = create_engine('sqlite:///catalog.db')
+engine = create_engine('postgresql://catalog:catalog@localhost/catalog')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
@@ -80,13 +86,12 @@ def fbconnect():
     access_token = request.data
     print "access token received %s " % access_token
 
-    app_id = json.loads(open('fb_client_secrets.json', 'r').read())[
+    app_id = json.loads(open(JSON_PATH + 'fb_client_secrets.json', 'r').read())[
         'web']['app_id']
     app_secret = json.loads(
-        open('fb_client_secrets.json', 'r').read())['web']['app_secret']
+        open(JSON_PATH + 'fb_client_secrets.json', 'r').read())['web']['app_secret']
     url = 'https://graph.facebook.com/oauth/access_token?'
-    url += 'grant_type=fb_exchange_token&client_id=%s&client_secret=%s&'
-    url += 'fb_exchange_token=%s' % (app_id, app_secret, access_token)
+    url += 'grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (app_id, app_secret, access_token)
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
 
@@ -154,8 +159,7 @@ def fbdisconnect():
     facebook_id = login_session['facebook_id']
     # The access token must me included to successfully logout
     access_token = login_session['access_token']
-    url = 'https://graph.facebook.com/%s/permissions?'
-    url += 'access_token=%s' % (facebook_id, access_token)
+    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id, access_token)
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
     return "you have been logged out"
@@ -174,8 +178,8 @@ def gconnect():
 
     try:
         # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
-        oauth_flow.redirect_uri = 'postmessage'
+        oauth_flow = flow_from_clientsecrets(JSON_PATH + 'client_secrets.json', scope='')
+	oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
         response = make_response(
@@ -185,11 +189,13 @@ def gconnect():
 
     # Check that the access token is valid.
     access_token = credentials.access_token
+    logging.error(access_token)
     login_session['access_token'] = access_token
     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
            % access_token)
     h = httplib2.Http()
     result = json.loads(h.request(url, 'GET')[1])
+    logging.error(result)
     # If there was an error in the access token info, abort.
     if result.get('error') is not None:
         response = make_response(json.dumps(result.get('error')), 500)
@@ -259,8 +265,8 @@ def gconnect():
 def gdisconnect():
     access_token = login_session['access_token']
     print 'In gdisconnect access token is %s', access_token
-    print 'User name is: ' 
-    print login_session['username']
+    # print 'User name is: ' 
+    # print login_session['username']
     if access_token is None:
         print 'Access Token is None'
         response = make_response(json.dumps('Current user not connected.'), 401)
@@ -273,10 +279,10 @@ def gdisconnect():
     print result
     if result['status'] == '200':
         del login_session['access_token'] 
-        del login_session['gplus_id']
-        del login_session['username']
-        del login_session['email']
-        del login_session['picture']
+       # del login_session['gplus_id']
+       # del login_session['username']
+       # del login_session['email']
+       # del login_session['picture']
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -421,7 +427,7 @@ def deleteRecipe(category_id, recipe_id):
         flash('Recipe Successfully Deleted')
         return redirect(url_for('showRecipes', category_id = category.id))
     else:
-        return render_template('deleteRecipe.html', category = category, recipe = recipe)
+        return render_template('deleterecipe.html', category = category, recipe = recipe)
 
 
 # Disconnect based on provider
@@ -448,6 +454,4 @@ def disconnect():
 
 
 if __name__ == '__main__':
-    app.secret_key = 'super_secret_key'
-    app.debug = True
-    app.run(host = '0.0.0.0', port = 8000)
+    app.run()
